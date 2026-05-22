@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { toast } from "sonner"
 
 export function SignupForm({ ...props }) {
   const router = useRouter();
@@ -26,8 +27,11 @@ export function SignupForm({ ...props }) {
     })
 
     if(data) {
-      alert("Account created successfully!");
+      toast.success("Account created successfully!");
       router.push("/login");
+    }
+    if (error) {
+      toast.error(error.message);
     }
   }
 
