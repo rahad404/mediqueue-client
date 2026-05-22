@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,11 +14,28 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
 import Link from "next/link";
 
-export function SignupForm({
-  ...props
-}) {
+export function SignupForm({ ...props }) {
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const userData = Object.fromEntries(formData.entries());
+
+    // This will now log your actual values!
+    console.log(userData);
+
+    const { data, error } = await authClient.signUp.email({
+      email: userData.email,
+      password: userData.password,
+      name: userData.name,
+      image: userData.image, // Maps to name="image" below
+    })
+    console.log(data, error);
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -27,23 +45,27 @@ export function SignupForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={onSubmit}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              {/* Added name="name" */}
+              <Input id="name" name="name" type="text" placeholder="John Doe" required />
             </Field>
             <Field>
-              <FieldLabel htmlFor="url">Image url</FieldLabel>
-              <Input id="name" type="text" placeholder="image.com/myprofile.png" required />
+              <FieldLabel htmlFor="image">Image url</FieldLabel>
+              {/* Fixed id to "image" and added name="image" */}
+              <Input id="image" name="image" type="text" placeholder="Profile Image Url" required />
             </Field>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              {/* Added name="email" */}
+              <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </Field>
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
+              {/* Added name="password" */}
+              <Input id="password" name="password" type="password" required />
               <FieldDescription>
                 Must be at least 8 characters long.
               </FieldDescription>
