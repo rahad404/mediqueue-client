@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { Menu, X, BookUser } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "./ui/modetoggle"
 
 export function Navbar() {
    const [isOpen, setIsOpen] = React.useState(false)
@@ -19,12 +20,14 @@ export function Navbar() {
          <div className="container mx-auto flex h-16 items-center justify-between px-4">
 
             {/* Logo Section */}
-            <div className="flex items-center space-x-2 cursor-pointer">
-               <BookUser className="h-6 w-6 text-primary" />
-               <span className="text-xl font-bold tracking-tight text-foreground">
-                  MediQueue
-               </span>
-            </div>
+            <Link href="/">
+               <div className="flex items-center space-x-2 cursor-pointer">
+                  <BookUser className="h-6 w-6 text-primary" />
+                  <span className="text-xl font-bold tracking-tight text-foreground">
+                     MediQueue
+                  </span>
+               </div>
+            </Link>
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -41,6 +44,7 @@ export function Navbar() {
 
             {/* Desktop Auth Actions */}
             <div className="hidden md:flex items-center space-x-3">
+               <ModeToggle />
                <Link href="/login">
                   <Button variant="ghost">Log in</Button>
                </Link>
@@ -77,6 +81,7 @@ export function Navbar() {
                </div>
                <hr className="border-border" />
                <div className="flex flex-col space-y-2">
+                  <ModeToggle />
                   <Link href="/login" className="w-full">
                      <Button variant="ghost" className="w-full justify-center">
                         Log in
