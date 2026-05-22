@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
 
 export function SignupForm({ ...props }) {
+  const router = useRouter();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +24,11 @@ export function SignupForm({ ...props }) {
       name: userData.name,
       image: userData.image, // Maps to name="image" below
     })
-    console.log(data, error);
+
+    if(data) {
+      alert("Account created successfully!");
+      router.push("/login");
+    }
   }
 
   return (
