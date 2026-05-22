@@ -6,7 +6,7 @@ import { Menu, X, BookUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./ui/modetoggle";
 import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 import {
   Avatar,
@@ -19,13 +19,17 @@ export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const navLinks = [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Home", href: "/" },
+    { label: "Tutors", href: "/tutors" },
+  ];
+
+  const privateNavLink = [
+    { label: "Add Tutor", href: "/add-tutor" },
+    { label: "My Tutor", href: "/my-tutor" },
+    { label: "My Booked Sessions", href: "/my-booked-sessions" },
   ];
 
   const { data: session } = authClient.useSession();
-
   const user = session?.user;
 
   const handleLogout = async () => {
@@ -35,8 +39,10 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo Section */}
+
+        {/* Logo */}
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer">
             <BookUser className="h-6 w-6 text-primary" />
@@ -46,33 +52,54 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
               href={link.href}
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
+
+          {user &&
+            privateNavLink.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            ))}
         </div>
 
-        {/* Desktop Auth Actions */}
+        {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
           <ModeToggle />
 
           {user ? (
             <>
-              <Link href="/profile" className="flex justify-center align-center space-x-4 font-medium">
+              <Link
+                href="/profile"
+                className="flex items-center space-x-3 font-medium"
+              >
                 <Avatar>
-                  <AvatarImage referrerPolicy="no-referrer" src={user?.image} alt="@shadcn" />
-                  <AvatarFallback>{user.name[0]}</AvatarFallback>
+                  <AvatarImage
+                    referrerPolicy="no-referrer"
+                    src={user?.image}
+                    alt={user?.name}
+                  />
+                  <AvatarFallback>
+                    {user?.name?.[0]}
+                  </AvatarFallback>
                   <AvatarBadge className="bg-[#33ff00] dark:bg-[#2cdd00]" />
                 </Avatar>
                 <Button variant="ghost">Profile</Button>
               </Link>
+
               <Button onClick={handleLogout}>Log out</Button>
             </>
           ) : (
@@ -87,45 +114,130 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <div className="flex md:hidden">
+        {/* Mobile Right Section (NEW FIX) */}
+        <div className="flex md:hidden items-center gap-2">
+
+          {/* Avatar on mobile */}
+          {user && (
+            <Link href="/profile" onClick={() => setIsOpen(false)}>
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  referrerPolicy="no-referrer"
+                  src={user?.image}
+                  alt={user?.name}
+                />
+                <AvatarFallback>
+                  {user?.name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+          )}
+
+          {/* Burger Menu */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle Menu"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </Button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Panel */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden border-b bg-background px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-5 duration-200">
+
+          {/* Nav Links */}
           <div className="flex flex-col space-y-3">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground py-2"
                 onClick={() => setIsOpen(false)}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground py-2"
               >
                 {link.label}
               </Link>
             ))}
+
+            {user &&
+              privateNavLink.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground py-2"
+                >
+                  {link.label}
+                </Link>
+              ))}
           </div>
+
           <hr className="border-border" />
-          <div className="flex flex-col space-y-2">
-            <ModeToggle />
-            <Link href="/login" className="w-full">
-              <Button variant="ghost" className="w-full justify-center">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/signup" className="w-full">
-              <Button className="w-full justify-center">Sign up</Button>
-            </Link>
+
+          {/* Auth */}
+          <div className="flex flex-col space-y-3">
+            <div className="flex justify-center">
+              <ModeToggle />
+            </div>
+
+            {user ? (
+              <>
+                <Link
+                  href="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 border rounded-md p-3"
+                >
+                  <Avatar>
+                    <AvatarImage
+                      referrerPolicy="no-referrer"
+                      src={user?.image}
+                      alt={user?.name}
+                    />
+                    <AvatarFallback>
+                      {user?.name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex flex-col">
+                    <span className="font-medium">{user?.name}</span>
+                    <span className="text-sm text-muted-foreground">
+                      View Profile
+                    </span>
+                  </div>
+                </Link>
+
+                <Button
+                  className="w-full"
+                  onClick={async () => {
+                    await handleLogout();
+                    setIsOpen(false);
+                  }}
+                >
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setIsOpen(false)}>
+                  <Button variant="ghost" className="w-full">
+                    Log in
+                  </Button>
+                </Link>
+
+                <Link href="/signup" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full">
+                    Sign up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
