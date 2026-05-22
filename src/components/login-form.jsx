@@ -8,6 +8,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner"
+import { FaGoogle } from "react-icons/fa";
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
@@ -25,6 +26,19 @@ export function LoginForm({ className, ...props }) {
       password: userData.password,
     });
 
+    if (data) {
+      toast.success("Logged in successfully!");
+      router.push("/");
+    }
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
     if (data) {
       toast.success("Logged in successfully!");
       router.push("/");
@@ -58,7 +72,8 @@ export function LoginForm({ className, ...props }) {
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
+                <Button onClick={handleGoogleLogin} variant="outline" type="button">
+                  <FaGoogle className="mr-2" />
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">

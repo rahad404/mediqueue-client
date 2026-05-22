@@ -67,7 +67,7 @@ export function Navbar() {
             <>
               <Link href="/profile" className="flex justify-center align-center space-x-4 font-medium">
                 <Avatar>
-                  <AvatarImage src={user?.image} alt="@shadcn" />
+                  <AvatarImage referrerPolicy="no-referrer" src={user?.image} alt="@shadcn" />
                   <AvatarFallback>{user.name[0]}</AvatarFallback>
                   <AvatarBadge className="bg-[#33ff00] dark:bg-[#2cdd00]" />
                 </Avatar>
