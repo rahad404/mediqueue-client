@@ -1,192 +1,345 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import {
-  BookOpen,
-  Clock,
-  Calendar,
-  MapPin,
-  GraduationCap,
-  DollarSign,
-  Users,
-  Loader2,
-  Search,
-  ArrowRight
-} from "lucide-react"
+import { GraduationCap, Users, Loader2, Search, ArrowRight, Filter, X, SlidersHorizontal, MapPin,CalendarClock} from "lucide-react"
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
+import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import Image from "next/image"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+// achive delay in search field while tupe
+function useDebounce(value, delay = 500) {
+  const [debounced, setDebounced] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounced(value)
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [value, delay])
+
+  return debounced
+}
+
+// load all tutor or filtered
 export default function TutorsPage() {
   const router = useRouter()
+
   const [tutors, setTutors] = useState([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
 
-  // Fetch all tutor card data profiles on mount
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        // Update this endpoint to match your actual backend URL structure
-        const res = await fetch("http://localhost:5000/tutors")
-        if (res.ok) {
-          const data = await res.json()
-          setTutors(data)
-        } else {
-          console.error("Failed to load tutors data structural assets.")
-        }
-      } catch (error) {
-        console.error("Error communicating with data APIs:", error)
-      } finally {
-        // Fallback placeholder data for immediate testing if backend is currently empty
-        setLoading(false)
-      }
-    };
-    fetchTutors()
-  }, [])
+  const [searchInput, setSearchInput] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+  const [filterOpen, setFilterOpen] = useState(false)
 
-  // Filter tutors based on name or subject input match
-  const filteredTutors = tutors.filter(tutor =>
-    tutor.tutorName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tutor.subject?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const debouncedSearch = useDebounce(searchInput, 500)
 
-  if (loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-50/50 dark:bg-zinc-900/50">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground font-medium">Finding available tutors...</p>
-        </div>
-      </div>
-    )
+  const hasActiveFilters = Boolean(startDate) || Boolean(endDate)
+
+  const clearFilters = () => {
+    setStartDate("")
+    setEndDate("")
+    setFilterOpen(false)
   }
 
+  const fetchTutors = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const params = new URLSearchParams()
+
+      if (debouncedSearch.trim()) {
+        params.set("search", debouncedSearch.trim())
+      }
+
+      if (startDate) {
+        params.set("startDate", startDate)
+      }
+
+      if (endDate) {
+        params.set("endDate", endDate)
+      }
+
+      // api url to hit GET: /tutor
+      const url = `${API_BASE}/tutors${ params.toString() ? `?${params.toString()}` : "" }`
+
+      const res = await fetch(url)
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch tutors")
+      }
+
+      const data = await res.json()
+      setTutors(data)
+    }
+    catch (error) {
+      console.error(error)
+      setTutors([])
+    }
+    finally {
+      setLoading(false)
+    }
+  }, [debouncedSearch, startDate, endDate])
+
+  useEffect(() => { fetchTutors() }, [fetchTutors])
+
+  const teachingModeStyle = (mode) => {
+    if (mode === "Online") {
+      return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400"
+    }
+
+    if (mode === "Offline") {
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400"
+    }
+
+    return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400"
+  }
+
+
+  // function return the page
   return (
-    <div className="min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6 lg:px-8 dark:bg-zinc-900/50">
+    <div className="min-h-screen bg-slate-50/50 px-4 py-12 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-7xl space-y-8">
 
-        {/* Header Title Section */}
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b pb-6">
+        {/* Header */}
+        <div className="flex flex-col gap-5 border-b pb-6 md:flex-row md:items-end md:justify-between">
+
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50">Find Your Expert Tutor</h1>
-            <p className="mt-2 text-base text-muted-foreground">
-              Browse professional educators, verify availability constraints, and book direct private sessions.
+            <h1 className="text-4xl font-bold tracking-tight">
+              Find Your Expert Tutor
+            </h1>
+
+            <p className="mt-2 text-muted-foreground">
+              Browse tutors, check availability, and book sessions.
             </p>
           </div>
 
-          {/* Dynamic Search Bar */}
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or subject..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 w-full bg-background shadow-sm"
-            />
+          {/* Search + filter */}
+          <div className="flex w-full items-center gap-2 md:w-auto">
+
+            <div className="relative flex-1 md:w-80">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+              <Input
+                value={searchInput}
+                placeholder="Search tutor..."
+                className="pl-9"
+                onChange={(e) =>
+                  setSearchInput(e.target.value)
+                }
+              />
+
+              {searchInput && (
+                <button onClick={() => setSearchInput("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X className="h-4 w-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter */}
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button size="icon" variant="outline" className="relative">
+                  <SlidersHorizontal className="h-4 w-4" />
+
+                  {hasActiveFilters && (
+                    <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                className="w-80 p-4"
+                align="end"
+              >
+                <div className="space-y-4">
+
+                  <div className="flex items-center justify-between">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold">
+                      <Filter className="h-4 w-4" />
+                      Filter by Session Date
+                    </h4>
+
+                    {hasActiveFilters && (
+                      <button onClick={clearFilters} className="text-xs text-muted-foreground">
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>From</Label>
+
+                    <Input
+                      type="date"
+                      value={startDate}
+                      max={endDate || undefined}
+                      onChange={(e) =>setStartDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>To</Label>
+
+                    <Input
+                      type="date"
+                      value={endDate}
+                      min={startDate || undefined}
+                      onChange={(e) =>setEndDate(e.target.value)}
+                    />
+                  </div>
+
+                  <Button className="w-full" onClick={() => setFilterOpen(false)}>
+                    Apply Filter
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
-        {/* Empty State Layout Fallback */}
-        {filteredTutors.length === 0 && (
-          <div className="text-center py-20 bg-background rounded-xl border border-dashed shadow-sm">
-            <GraduationCap className="mx-auto h-12 w-12 text-muted-foreground stroke-[1.5]" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-zinc-100">No tutors found</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Try adjusting your keywords or check back later.</p>
+        {/* Active filters */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2">
+
+            <span className="text-xs text-muted-foreground">
+              Active filters:
+            </span>
+
+            {startDate && (
+              <Badge variant="secondary" className="gap-1">
+                From:
+                {new Date(startDate).toLocaleDateString()}
+
+                <button onClick={() =>setStartDate("")}>
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {endDate && (
+              <Badge variant="secondary" className="gap-1">
+                To:
+                {new Date(endDate).toLocaleDateString()}
+
+                <button onClick={() =>setEndDate("")}>
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
           </div>
         )}
 
-        {/* 3-Column Responsive Grid System Layout */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredTutors.map((tutor) => (
-            <Card
-              key={tutor._id || tutor.id}
-              className="group flex flex-col justify-between overflow-hidden rounded-xl border border-slate-200/80 bg-background shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-zinc-700"
-            >
-              <div>
-                {/* Visual Banner Image Header Container - Restored to full size */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
-                  <img
-                    src={tutor.photo || "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80"}
-                    alt={tutor.tutorName}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                  {/* Subtle overlay gradients to make text stand out if needed */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 via-transparent to-transparent" />
+        {/* Loading */}
+        {loading && (
+          <div className="flex justify-center py-20">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          </div>
+        )}
 
-                  {/* Floating Absolute Badges */}
-                  <div className="absolute top-3 left-3">
-                    <span className="inline-flex items-center rounded-md bg-background/90 px-2.5 py-1 text-xs font-semibold tracking-wide border shadow-sm backdrop-blur-md">
-                      {tutor.subject}
-                    </span>
+        {/* Empty */}
+        {!loading && tutors.length === 0 && (
+          <div className="rounded-xl border border-dashed bg-background py-16 text-center">
+            <GraduationCap className="mx-auto h-10 w-10 text-muted-foreground" />
+
+            <h3 className="mt-4 text-lg font-semibold">
+              No tutors found
+            </h3>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try changing search or filters.
+            </p>
+          </div>
+        )}
+
+        {/* Grid for tutor cards */}
+        {!loading && tutors.length > 0 && (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+            {tutors.map((tutor) => (
+              <Card key={tutor._id} className="overflow-hidden transition hover:-translate-y-1 hover:shadow-md">
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={ tutor.photo || "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600"}
+                    alt={tutor.tutorName}
+                    className="h-full w-full object-cover"
+                  />
+
+                  <div className="absolute left-3 top-3 rounded bg-background px-2 py-1 text-xs font-medium">
+                    {tutor.subject}
                   </div>
-                  <div className="absolute top-3 right-3">
-                    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide border shadow-sm ${
-                      tutor.teachingMode === 'Online'
-                        ? 'bg-blue-50/95 text-blue-700 border-blue-200 dark:bg-blue-950/90 dark:text-blue-400 dark:border-blue-900'
-                        : tutor.teachingMode === 'Offline'
-                        ? 'bg-amber-50/95 text-amber-700 border-amber-200 dark:bg-amber-950/90 dark:text-amber-400 dark:border-amber-900'
-                        : 'bg-emerald-50/95 text-emerald-700 border-emerald-200 dark:bg-emerald-950/90 dark:text-emerald-400 dark:border-emerald-900'
-                    }`}>
-                      {tutor.teachingMode}
-                    </span>
+
+                  <div className={`absolute right-3 top-3 rounded border px-2 py-1 text-xs font-medium ${teachingModeStyle(tutor.teachingMode)}`}>
+                    {tutor.teachingMode}
                   </div>
                 </div>
 
-                {/* Info Body */}
-                <div className="p-4 space-y-3">
-                  <div className="space-y-1">
-                    <h2 className="font-bold text-slate-900 dark:text-zinc-50 tracking-tight text-lg group-hover:text-primary transition-colors truncate">
+                <div className="space-y-4 p-4">
+                  <div>
+                    <h2 className="text-lg font-bold">
                       {tutor.tutorName}
                     </h2>
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                      <GraduationCap className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-zinc-500" />
-                      <span className="truncate">{tutor.institution}</span>
+
+                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                      <GraduationCap className="h-4 w-4" />
+                      {tutor.institution}
                     </div>
                   </div>
 
-                  {/* Clean Inline Metadata Grid */}
-                  <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-600 dark:border-zinc-800/80 dark:text-zinc-400">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span className="truncate max-w-[140px]">{tutor.location}</span>
+                  <div className="flex items-center justify-between text-sm">
+
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      {tutor.location}
                     </div>
-                    <div className="flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400/90">
-                      <Users className="h-3.5 w-3.5 shrink-0" />
-                      <span>{tutor.totalSlots || 0} slots left</span>
+
+                    <div className="flex items-center gap-2 text-amber-600">
+                      <Users className="h-4 w-4" />
+                      {tutor.totalSlots <= 0? "Fully booked" : `${tutor.totalSlots} left`}
                     </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CalendarClock className="h-4 w-4"/>
+                      Start on:
+                    </div>
+
+                    <div className="flex items-center gap-2 text-amber-600">
+                      {tutor.sessionStartDate}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between border-t pt-4">
+
+                    <div>
+                      <p className="text-xs text-muted-foreground">Hourly Rate</p>
+
+                      <p className="text-xl font-bold">
+                        ৳{tutor.hourlyFee}
+                        <span className="ml-1 text-sm font-normal text-muted-foreground">/hr</span>
+                      </p>
+                    </div>
+
+                    <Button size="sm" onClick={() =>router.push(`/tutors/${tutor._id}`)}>
+                      Book Session
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-
-              {/* Footer CTA & Pricing Block */}
-              <div className="mx-4 mb-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-zinc-800/80">
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Hourly Rate</span>
-                  <div className="flex items-baseline font-bold text-slate-900 dark:text-zinc-50">
-                    <span className="text-sm font-semibold mr-0.5">৳</span>
-                    <span className="text-xl tracking-tight">{tutor.hourlyFee}</span>
-                    <span className="text-xs font-normal text-muted-foreground ml-0.5">/hr</span>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => router.push(`/tutors/${tutor._id || tutor.id}`)}
-                  size="sm"
-                  className="rounded-lg font-medium px-4 h-9 shadow-sm hover:opacity-95 transition-opacity"
-                >
-                  Book Session
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

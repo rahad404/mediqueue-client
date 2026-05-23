@@ -2,7 +2,8 @@ import * as React from "react";
 import Link from "next/link";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaMapPin, FaPhone, FaEnvelope ,IoMdMail} from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { FaRProject } from "react-icons/fa6";
+import { BookUser } from "lucide-react";
+
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -35,7 +36,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="flex flex-col space-y-4">
             <Link href="/" className="flex items-center space-x-2 font-bold tracking-tight">
-              <FaMapPin className="h-6 w-6 text-primary" />
+              <BookUser className="h-6 w-6 text-primary" />
               <span className="text-xl">MediQueue</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">

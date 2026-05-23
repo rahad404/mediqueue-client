@@ -14,23 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger,SelectValue,} from "@/
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
-// Import your Better-Auth client instance
+// Import Better-Auth client instance
 import { authClient } from "@/lib/auth-client";
 
 export default function AddTutorPage() {
   const router = useRouter();
 
-  // Auth state tracking
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  // Form component states
   const [startDate, setStartDate] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  // Better-Auth Protection Guard
   useEffect(() => {
     const checkAuth = async () => {
       const currentSession = await authClient.getSession();
@@ -54,11 +51,10 @@ export default function AddTutorPage() {
 
     setIsSubmitting(true);
 
-    // Gather form primitives natively
     const formData = new FormData(e.currentTarget);
     const rawData = Object.fromEntries(formData.entries());
 
-    // Structure full payload to match your backend expectations
+    // Structure 
     const tutorData = {
       tutorName: rawData.tutorName,
       photo: imageUrl,
@@ -72,14 +68,12 @@ export default function AddTutorPage() {
       experience: rawData.experience,
       location: rawData.location,
       teachingMode: rawData.teachingMode,
-      // Pass logged-in user tracking parameters down
       createdBy: session.email,
       userId: session.id,
     };
 
     try {
       const res = await fetch("http://localhost:5000/tutors", {
-        // Switch this route string to target your backend endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(tutorData),
@@ -87,7 +81,7 @@ export default function AddTutorPage() {
 
       if (res.ok) {
         toast.success("Tutor profile added successfully!");
-        router.push("/tutors"); // Change route path to destination page
+        router.push("/tutors");
       } else {
         toast.error("Something went wrong creating the profile.");
       }
@@ -99,7 +93,7 @@ export default function AddTutorPage() {
     }
   };
 
-  // Loader shell screen to prevent layout flashes
+  // Loader 
   if (authLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
@@ -146,9 +140,8 @@ export default function AddTutorPage() {
                     <SelectItem value="Chemistry">Chemistry</SelectItem>
                     <SelectItem value="Biology">Biology</SelectItem>
                     <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Computer Science">
-                      Computer Science
-                    </SelectItem>
+                    <SelectItem value="Computer Science">Computer Science</SelectItem>
+                    <SelectItem value="Electronics">Electronics</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
