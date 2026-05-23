@@ -107,7 +107,7 @@ export default function TutorsPage() {
 
   // function return the page
   return (
-    <div className="min-h-screen bg-slate-50/50 px-4 py-12 dark:bg-zinc-900/50">
+    <div className="min-h-screen bg-slate-50/50 px-16 py-8 dark:bg-zinc-900/50">
       <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Header */}
@@ -267,7 +267,8 @@ export default function TutorsPage() {
 
             {tutors.map((tutor) => (
               <Card key={tutor._id} className="overflow-hidden transition hover:-translate-y-1 hover:shadow-md">
-                <div className="relative aspect-[16/10] overflow-hidden">
+                {/* reduced image container height for smaller card */}
+                <div className="relative h-60 overflow-hidden">
                   <img
                     src={tutor.photo || "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600"}
                     alt={tutor.tutorName}
@@ -283,13 +284,14 @@ export default function TutorsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 p-4">
+                {/* tightened spacing inside card */}
+                <div className="space-y-3 p-3">
                   <div>
-                    <h2 className="text-lg font-bold">
+                    <h2 className="text-base font-bold">
                       {tutor.tutorName}
                     </h2>
 
-                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                       <GraduationCap className="h-4 w-4" />
                       {tutor.institution}
                     </div>
@@ -319,7 +321,7 @@ export default function TutorsPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border-t pt-4">
+                  <div className="flex items-center justify-between border-t pt-3">
 
                     <div>
                       <p className="text-xs text-muted-foreground">Hourly Rate</p>

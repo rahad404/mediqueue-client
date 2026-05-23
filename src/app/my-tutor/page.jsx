@@ -133,7 +133,7 @@ export default function MyTutorsPage() {
    }
 
    return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-900/50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-900/50 py-8 px-4 sm:px-6 lg:px-16">
          <div className="mx-auto max-w-7xl space-y-6">
 
             {/* ── Header ── */}
