@@ -1,6 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaMapPin, FaPhone, FaEnvelope ,IoMdMail} from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaLinkedin, FaMapPin, FaPhone, FaEnvelope ,IoMdMail} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { BookUser } from "lucide-react";
 
@@ -9,10 +10,10 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const servicesLinks = [
-    { label: "Find a Tutor", href: "/tutor" },
+    { label: "Find a Tutor", href: "/tutors" },
     { label: "Become a Tutor", href: "/add-tutor" },
     { label: "Booked Sessions", href: "/my-booked-sessions" },
-    { label: "Online Classes", href: "/classes" },
+    { label: "Online Classes", href: "/" },
   ];
 
   const supportLinks = [
@@ -23,7 +24,7 @@ export function Footer() {
 
   const socialLinks = [
     { icon: FaFacebook, href: "https://facebook.com", label: "Facebook" },
-    { icon: FaTwitter, href: "https://twitter.com", label: "Twitter" },
+    { icon: FaXTwitter, href: "https://twitter.com", label: "Twitter" },
     { icon: FaInstagram, href: "https://instagram.com", label: "Instagram" },
     { icon: FaLinkedin, href: "https://linkedin.com", label: "LinkedIn" },
   ];
