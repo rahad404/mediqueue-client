@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { GraduationCap, Users, Loader2, Search, ArrowRight, Filter, X, SlidersHorizontal, MapPin,CalendarClock} from "lucide-react"
+import { GraduationCap, Users, Loader2, Search, ArrowRight, Filter, X, SlidersHorizontal, MapPin, CalendarClock } from "lucide-react"
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 import Image from "next/image"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
@@ -70,7 +70,7 @@ export default function TutorsPage() {
       }
 
       // api url to hit GET: /tutor
-      const url = `${API_BASE}/tutors${ params.toString() ? `?${params.toString()}` : "" }`
+      const url = `${API_BASE}/tutors${params.toString() ? `?${params.toString()}` : ""}`
 
       const res = await fetch(url)
 
@@ -183,7 +183,7 @@ export default function TutorsPage() {
                       type="date"
                       value={startDate}
                       max={endDate || undefined}
-                      onChange={(e) =>setStartDate(e.target.value)}
+                      onChange={(e) => setStartDate(e.target.value)}
                     />
                   </div>
 
@@ -194,7 +194,7 @@ export default function TutorsPage() {
                       type="date"
                       value={endDate}
                       min={startDate || undefined}
-                      onChange={(e) =>setEndDate(e.target.value)}
+                      onChange={(e) => setEndDate(e.target.value)}
                     />
                   </div>
 
@@ -220,7 +220,7 @@ export default function TutorsPage() {
                 From:
                 {new Date(startDate).toLocaleDateString()}
 
-                <button onClick={() =>setStartDate("")}>
+                <button onClick={() => setStartDate("")}>
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
@@ -231,7 +231,7 @@ export default function TutorsPage() {
                 To:
                 {new Date(endDate).toLocaleDateString()}
 
-                <button onClick={() =>setEndDate("")}>
+                <button onClick={() => setEndDate("")}>
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
@@ -269,7 +269,7 @@ export default function TutorsPage() {
               <Card key={tutor._id} className="overflow-hidden transition hover:-translate-y-1 hover:shadow-md">
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <img
-                    src={ tutor.photo || "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600"}
+                    src={tutor.photo || "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600"}
                     alt={tutor.tutorName}
                     className="h-full w-full object-cover"
                   />
@@ -304,18 +304,18 @@ export default function TutorsPage() {
 
                     <div className="flex items-center gap-2 text-amber-600">
                       <Users className="h-4 w-4" />
-                      {tutor.totalSlots <= 0? "Fully booked" : `${tutor.totalSlots} left`}
+                      {tutor.totalSlots <= 0 ? "Fully booked" : `${tutor.totalSlots} left`}
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm">
 
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <CalendarClock className="h-4 w-4"/>
+                      <CalendarClock className="h-4 w-4" />
                       Start on:
                     </div>
 
                     <div className="flex items-center gap-2 text-amber-600">
-                      {tutor.sessionStartDate}
+                      {tutor.sessionStartDate ? new Date(tutor.sessionStartDate).toLocaleDateString("en-US", { dateStyle: "long" }):'-'}
                     </div>
                   </div>
 
@@ -330,7 +330,7 @@ export default function TutorsPage() {
                       </p>
                     </div>
 
-                    <Button size="sm" onClick={() =>router.push(`/tutors/${tutor._id}`)}>
+                    <Button size="sm" onClick={() => router.push(`/tutors/${tutor._id}`)}>
                       Book Session
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>

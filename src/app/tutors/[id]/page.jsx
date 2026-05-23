@@ -169,7 +169,7 @@ export default function TutorDetailsPage() {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Starts On: </span>
                 <Badge className="font-semibold bg-primary/10 text-primary border-none hover:bg-primary/10">
-                  {tutor.sessionStartDate}
+                  {tutor.sessionStartDate ? new Date(tutor.sessionStartDate).toLocaleDateString("en-US", { dateStyle: "long" }):'-'}
                 </Badge>
               </div>
             </CardContent>

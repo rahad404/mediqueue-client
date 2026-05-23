@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./ui/modetoggle";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import {
   Avatar,
@@ -17,6 +18,7 @@ import {
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const router = useRouter();
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -35,6 +37,7 @@ export function Navbar() {
   const handleLogout = async () => {
     await authClient.signOut();
     toast.success("Logged out successfully");
+    router.push("/");
   };
 
   return (
