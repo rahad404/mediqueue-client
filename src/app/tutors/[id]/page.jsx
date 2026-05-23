@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 
-// BetterAuth session hook 
+// BetterAuth session hook
 
 import { authClient } from "@/lib/auth-client"
 
@@ -25,18 +25,18 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
 export default function TutorDetailsPage() {
   const { id } = useParams()
-  const router  = useRouter()
+  const router = useRouter()
 
-  // Real logged-in user 
+  // Real logged-in user
   const { data: sessionData, isPending: sessionLoading } = authClient.useSession()
   const currentUser = sessionData?.user   // null when not logged in
 
-  const [tutor, setTutor]               = useState(null)
-  const [loading, setLoading]           = useState(true)
+  const [tutor, setTutor] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState(false)
-  const [isModalOpen, setIsModalOpen]   = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Fetch tutor data 
+  // Fetch tutor data
   useEffect(() => {
     const fetchTutor = async () => {
       try {
@@ -51,7 +51,7 @@ export default function TutorDetailsPage() {
     fetchTutor()
   }, [id])
 
-  // Booking submit 
+  // Booking submit
   const handleBookingSubmit = async (e) => {
     e.preventDefault()
     if (!currentUser) {
@@ -66,9 +66,9 @@ export default function TutorDetailsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tutorId:      tutor._id,
-          tutorName:    tutor.tutorName,
-          studentName:  currentUser.name,
+          tutorId: tutor._id,
+          tutorName: tutor.tutorName,
+          studentName: e.target.name.value,
           studentEmail: currentUser.email,
           studentPhone: e.target.phone.value,
         }),
@@ -91,7 +91,7 @@ export default function TutorDetailsPage() {
     }
   }
 
-  // Loading / not found states 
+  // Loading / not found states
   if (loading || sessionLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -114,11 +114,12 @@ export default function TutorDetailsPage() {
 
   const totalSlotsLeft = tutor.totalSlots || 0
   const isFullyBooked = totalSlotsLeft <= 0
-  const parsedSessionDate = tutor.sessionDate ? new Date(tutor.sessionDate) : null
-  const isDateRestricted = parsedSessionDate ? new Date() < parsedSessionDate : false
+  const parsedsessionStartDate = tutor.sessionStartDate ? new Date(tutor.sessionStartDate) : null
+  // booking should be closed when the current date is AFTER the session start date
+  const isBookingClosed = parsedsessionStartDate ? new Date() > parsedsessionStartDate : false
 
-  // The button is disabled (but always visible) when fully booked or date-restricted
-  const bookingBlocked = isFullyBooked || isDateRestricted
+  // The button is disabled (but always visible) when fully booked or booking is closed
+  const bookingBlocked = isFullyBooked || isBookingClosed
 
   const teachingModeStyle = (mode) => {
     if (mode === "Online")
@@ -166,7 +167,7 @@ export default function TutorDetailsPage() {
                 </Badge>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Start On: </span>
+                <span className="text-muted-foreground">Starts On: </span>
                 <Badge className="font-semibold bg-primary/10 text-primary border-none hover:bg-primary/10">
                   {tutor.sessionStartDate}
                 </Badge>
@@ -206,8 +207,8 @@ export default function TutorDetailsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { icon: <Calendar className="h-4 w-4 text-primary" />, label: "Available Days", value: tutor.availableDays || "Flexible" },
-              { icon: <Clock className="h-4 w-4 text-primary" />,    label: "Timing Window",  value: tutor.availableTime || "Contact directly" },
-              { icon: <Users className="h-4 w-4 text-amber-600" />,  label: "Slots Left",     value: isFullyBooked ? "Fully booked" : `${totalSlotsLeft} available` },
+              { icon: <Clock className="h-4 w-4 text-primary" />, label: "Timing Window", value: tutor.availableTime || "Contact directly" },
+              { icon: <Users className="h-4 w-4 text-amber-600" />, label: "Slots Left", value: isFullyBooked ? "Fully booked" : `${totalSlotsLeft} available` },
             ].map(({ icon, label, value }) => (
               <div key={label} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-zinc-900 dark:bg-zinc-900/40 text-xs">
                 {icon}
@@ -226,12 +227,11 @@ export default function TutorDetailsPage() {
             </div>
           )}
 
-          {!isFullyBooked && isDateRestricted && (
+          {!isFullyBooked && isBookingClosed && (
             <div className="flex items-center gap-2 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm font-medium">
               <Calendar className="h-5 w-5 shrink-0" />
               <span>
-                Booking not open yet. Unlocks on{" "}
-                {parsedSessionDate.toLocaleDateString("en-US", { dateStyle: "long" })}.
+                Booking is over on {parsedsessionStartDate.toLocaleDateString("en-US", { dateStyle: "long" })}.
               </span>
             </div>
           )}
@@ -248,7 +248,7 @@ export default function TutorDetailsPage() {
                     onClick={(e) => { if (bookingBlocked) e.preventDefault() }}
                   >
                     <BookOpen className="mr-2 h-4 w-4" />
-                    {isFullyBooked ? "Session Full" : isDateRestricted ? "Not Open Yet" : "Book Class Session"}
+                    {isFullyBooked ? "Session Full" : isBookingClosed ? "Booking Closed" : "Book Class Session"}
                   </Button>
                 </span>
               </DialogTrigger>
@@ -275,11 +275,14 @@ export default function TutorDetailsPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Your Name</Label>
+                        <Label htmlFor="name" className="text-xs font-semibold">
+                          Your Name <span className="text-destructive">*</span>
+                        </Label>
                         <Input
-                          value={currentUser?.name ?? ""}
-                          disabled
-                          className="bg-slate-50 dark:bg-zinc-900 font-medium"
+                          id="name"
+                          name="name"
+                          required
+                          placeholder="name"
                         />
                       </div>
                       <div className="space-y-1">
