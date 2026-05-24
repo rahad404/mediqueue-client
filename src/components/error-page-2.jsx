@@ -1,9 +1,17 @@
+'use client';
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, LifeBuoy } from 'lucide-react'
 import { BookUser } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const ErrorPage2 = () => {
+  const router = useRouter();
+
+  const redirectHandler = () => {
+    router.push('/');
+  };
+
   return (
     <div className='grid min-h-screen w-full bg-background xl:grid-cols-2'>
       {/* Left Content Side */}
@@ -33,7 +41,7 @@ const ErrorPage2 = () => {
 
           {/* Action Buttons */}
           <div className='mt-10 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto'>
-            <Button className="w-full sm:w-auto h-10 px-5 gap-2 font-medium shadow-sm transition-all hover:opacity-90">
+            <Button onClick={redirectHandler} className="w-full sm:w-auto h-10 px-5 gap-2 font-medium shadow-sm transition-all hover:opacity-90">
               <ArrowLeft className="size-4" />
               <span>Go back home</span>
             </Button>
