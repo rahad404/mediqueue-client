@@ -75,12 +75,9 @@ const HeroSection = () => {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-3">
                      {stats.map(({ icon: Icon, label, value }) => (
-                        <div
-                           key={label}
-                           className="bg-card border rounded-2xl p-4 shadow-sm"
-                        >
+                        <div key={label} className="bg-card border rounded-2xl p-4 shadow-sm lg:flex">
                            <div className="flex items-center gap-3">
                               <div className="bg-primary/10 text-primary rounded-xl p-2">
                                  <Icon size={20} />

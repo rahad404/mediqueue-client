@@ -31,8 +31,8 @@ const R = 220
 const THETA = 32
 const AUTOPLAY_DELAY = 3000
 
-const CARD_W = 300
-const CARD_H = 400
+const CARD_W = 320
+const CARD_H = 420
 
 const SPRING = {
   type: 'spring',
@@ -133,7 +133,7 @@ const RadialCarousel = () => {
               style={{
                 width: CARD_W,
                 height: CARD_H,
-                marginLeft: -(CARD_W / 2),
+                marginLeft: -(CARD_W / 2.5),
                 zIndex,
               }}
               animate={{
@@ -179,7 +179,7 @@ const RadialCarousel = () => {
         })}
       </div>
 
-      <div className="flex items-center gap-3">
+      {/* <div className="flex items-center gap-3">
         <CarouselPrevious
           className="static translate-y-0"
           onClick={() =>
@@ -197,7 +197,7 @@ const RadialCarousel = () => {
             )
           }
         />
-      </div>
+      </div> */}
     </Carousel>
   )
 }
