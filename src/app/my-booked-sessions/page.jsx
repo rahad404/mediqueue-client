@@ -86,6 +86,7 @@ export default function MyBookedSessionsPage() {
         }
         if (tokenData) {
           const jwtToken = tokenData.token;
+          // console.log(jwtToken);
           const res = await fetch(`${API_BASE}/bookings/${currentUser.email}`, {
             headers: {
               Authorization: `Bearer ${jwtToken}`,
@@ -114,7 +115,7 @@ export default function MyBookedSessionsPage() {
       }
       if (tokenData) {
         const jwtToken = tokenData.token;
-
+        // console.log(jwtToken);
         const res = await fetch(`${API_BASE}/bookings/${cancelBooking._id}`, {
           method: "PATCH",
           headers: {

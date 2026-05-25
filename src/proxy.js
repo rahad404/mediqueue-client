@@ -17,11 +17,10 @@ export async function proxy(request) {
 // Specify the exact routes you want this protection to apply to
 export const config = {
     matcher: [
-        "/tutors/:path*",
+        "/tutors/:path",
         "/add-tutor",
         "/my-tutor",
         "/my-booked-sessions",
         "/profile",
-        "/profile"
     ],
 };
