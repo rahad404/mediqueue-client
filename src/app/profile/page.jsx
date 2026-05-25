@@ -143,7 +143,7 @@ export default function ProfilePage() {
 
                      <div className="space-y-1.5">
                         <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">
-                           Email (read-only)
+                           Email (can't be changed)
                         </Label>
                         <Input
                            id="email"

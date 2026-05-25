@@ -140,8 +140,12 @@ export default function AddTutorPage() {
                     <SelectItem value="Chemistry">Chemistry</SelectItem>
                     <SelectItem value="Biology">Biology</SelectItem>
                     <SelectItem value="English">English</SelectItem>
+                    <SelectItem value="Bangla">Bangla</SelectItem>
                     <SelectItem value="Computer Science">Computer Science</SelectItem>
                     <SelectItem value="Electronics">Electronics</SelectItem>
+                    <SelectItem value="Drawing&Painting">Drawing & Painting</SelectItem>
+                    <SelectItem value="Music">Music</SelectItem>
+
                   </SelectContent>
                 </Select>
               </div>

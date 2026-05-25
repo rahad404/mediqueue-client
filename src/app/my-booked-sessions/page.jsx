@@ -153,7 +153,7 @@ export default function MyBookedSessionsPage() {
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 w-10">#</TableHead>
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300">Tutor</TableHead>
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 hidden sm:table-cell">Student</TableHead>
-                           <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 hidden md:table-cell">Email</TableHead>
+                           <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 hidden md:table-cell">Phone</TableHead>
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 hidden lg:table-cell">Booked On</TableHead>
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300">Status</TableHead>
                            <TableHead className="font-semibold text-slate-700 dark:text-zinc-300 text-right">Action</TableHead>
@@ -184,7 +184,7 @@ export default function MyBookedSessionsPage() {
                                  </TableCell>
 
                                  <TableCell className="hidden md:table-cell">
-                                    <span className="text-sm text-muted-foreground">{booking.studentEmail}</span>
+                                    <span className="text-sm text-muted-foreground">{booking.studentPhone}</span>
                                  </TableCell>
 
                                  <TableCell className="hidden lg:table-cell">

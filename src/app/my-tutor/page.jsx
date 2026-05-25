@@ -19,7 +19,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
 const SUBJECTS = [
    "Mathematics", "Physics", "Chemistry", "Biology",
-   "English", "Bangla", "ICT", "History", "Geography", "Economics", "Electronics"
+   "English", "Bangla", "Computer Science", "Electronics", "Drawing&Painting", "Music"
 ]
 const TEACHING_MODES = ["Online", "Offline", "Both"]
 

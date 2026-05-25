@@ -28,7 +28,7 @@ export function SignupForm({ ...props }) {
       image: userData.image, // Maps to name="image" below
     })
 
-    if(data) {
+    if (data) {
       toast.success("Account created successfully!");
       router.push("/login");
     }
@@ -62,11 +62,13 @@ export function SignupForm({ ...props }) {
       <CardContent>
         <form onSubmit={onSubmit}>
           <FieldGroup>
+
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
               {/* Added name="name" */}
               <Input id="name" name="name" type="text" placeholder="John Doe" required />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="image">Image url</FieldLabel>
               {/* Fixed id to "image" and added name="image" */}
@@ -77,19 +79,29 @@ export function SignupForm({ ...props }) {
               {/* Added name="email" */}
               <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              {/* Added name="password" */}
-              <Input id="password" name="password" type="password" required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength={6}
+                // RegEx checking for: 1 uppercase, 1 lowercase, and minimum 6 characters
+                pattern="(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                title="Must be at least 6 characters long and include both uppercase and lowercase letters."
+              />
               <FieldDescription>
-                Must be at least 8 characters long.
+                Length must be at least 6 characters, with an uppercase letter and a lowercase letter.
               </FieldDescription>
             </Field>
+
             <FieldGroup>
               <Field>
                 <Button type="submit">Create Account</Button>
                 <Button onClick={handleGoogleLogin} variant="outline" type="button">
-                  <FaGoogle className="mr-2"/>
+                  <FaGoogle className="mr-2" />
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
