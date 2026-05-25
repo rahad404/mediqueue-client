@@ -80,9 +80,7 @@ export default function MyBookedSessionsPage() {
       try {
         const { data: tokenData, error: tokenError } = await authClient.token();
         if (tokenError || !tokenData) {
-          throw new Error(
-            tokenError?.message || "Authentication token not found",
-          );
+          throw new Error(tokenError?.message || "Authentication token not found",);
         }
         if (tokenData) {
           const jwtToken = tokenData.token;

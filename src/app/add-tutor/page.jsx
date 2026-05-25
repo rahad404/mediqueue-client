@@ -54,7 +54,7 @@ export default function AddTutorPage() {
     const formData = new FormData(e.currentTarget);
     const rawData = Object.fromEntries(formData.entries());
 
-    // Structure 
+    // Structure
     const tutorData = {
       tutorName: rawData.tutorName,
       photo: imageUrl,
@@ -73,17 +73,28 @@ export default function AddTutorPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/tutors", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tutorData),
-      });
+      const { data: tokenData, error: tokenError} = await authClient.token();
 
-      if (res.ok) {
-        toast.success("Tutor profile added successfully!");
-        router.push("/tutors");
-      } else {
-        toast.error("Something went wrong creating the profile.");
+      if (tokenError || !tokenData) {
+        throw new Error(tokenError?.message || "Authentication token not found",);
+      }
+      if (tokenData) {
+        const jwtToken = tokenData.token;
+        const res = await fetch("http://localhost:5000/tutors", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify(tutorData),
+        });
+
+        if (res.ok) {
+          toast.success("Tutor profile added successfully!");
+          router.push("/tutors");
+        } else {
+          toast.error("Something went wrong creating the profile.");
+        }
       }
     } catch (error) {
       console.error("Submission failed:", error);
@@ -93,7 +104,7 @@ export default function AddTutorPage() {
     }
   };
 
-  // Loader 
+  // Loader
   if (authLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
