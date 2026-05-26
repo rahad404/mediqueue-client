@@ -29,7 +29,6 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 // BetterAuth session hook
-
 import { authClient } from "@/lib/auth-client";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -52,7 +51,6 @@ export default function TutorDetailsPage() {
   useEffect(() => {
     const fetchTutor = async () => {
       try {
-        // jwt implemented
         const { data: tokenData, error: tokenError } = await authClient.token();
         if (tokenError || !tokenData) {
           throw new Error(tokenError?.message || "Authentication token not found");
@@ -128,7 +126,7 @@ export default function TutorDetailsPage() {
   // Loading / not found states
   if (loading || sessionLoading) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
+      <div className="flex h-[60vh] w-full items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
@@ -136,7 +134,7 @@ export default function TutorDetailsPage() {
 
   if (!tutor) {
     return (
-      <div className="mx-auto max-w-md py-20 text-center space-y-4">
+      <div className="mx-auto max-w-md w-full py-20 text-center space-y-4 px-4">
         <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
         <h2 className="text-xl font-bold">Tutor Profile Not Found</h2>
         <Button onClick={() => router.push("/tutors")} variant="outline">
@@ -151,24 +149,14 @@ export default function TutorDetailsPage() {
   const parsedsessionStartDate = tutor.sessionStartDate
     ? new Date(tutor.sessionStartDate)
     : null;
-  // booking should be closed when the current date is AFTER the session start date
   const isBookingClosed = parsedsessionStartDate
     ? new Date() > parsedsessionStartDate
     : false;
 
-  // The button is disabled (but always visible) when fully booked or booking is closed
   const bookingBlocked = isFullyBooked || isBookingClosed;
 
-  const teachingModeStyle = (mode) => {
-    if (mode === "Online")
-      return "bg-blue-50/95 text-blue-700 border-blue-200 dark:bg-blue-950/90 dark:text-blue-400 dark:border-blue-900";
-    if (mode === "Offline")
-      return "bg-amber-50/95 text-amber-700 border-amber-200 dark:bg-amber-950/90 dark:text-amber-400 dark:border-amber-900";
-    return "bg-emerald-50/95 text-emerald-700 border-emerald-200 dark:bg-emerald-950/90 dark:text-emerald-400 dark:border-emerald-900";
-  };
-
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
+    <div className="w-full max-w-5xl mx-auto px-4 py-8 space-y-6 box-border overflow-x-hidden">
       <Button
         onClick={() => router.push("/tutors")}
         variant="ghost"
@@ -177,20 +165,24 @@ export default function TutorDetailsPage() {
         <ArrowLeft className="h-4 w-4" /> Back to listings
       </Button>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        <div className="md:col-span-1 space-y-4">
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-zinc-800 dark:bg-zinc-900 aspect-square">
+      {/* Grid wrapper has strict full-width configurations */}
+      <div className="grid grid-cols-1 w-full gap-8 md:grid-cols-3">
+
+        {/* Left Column (Image & Quick stats) */}
+        <div className="md:col-span-1 w-full space-y-4 min-w-0">
+          {/* Explicitly bounding image overflow container */}
+          <div className="relative w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-zinc-800 dark:bg-zinc-900 aspect-square">
             <img
               src={
                 tutor.photo ||
                 "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80"
               }
               alt={tutor.tutorName}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover max-w-full"
             />
           </div>
 
-          <Card className="border-slate-200/60 dark:border-zinc-800/80 shadow-none">
+          <Card className="border-slate-200/60 dark:border-zinc-800/80 shadow-none w-full">
             <CardContent className="p-4 space-y-3.5">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Hourly Rate</span>
@@ -225,50 +217,51 @@ export default function TutorDetailsPage() {
           </Card>
         </div>
 
-        <div className="md:col-span-2 space-y-6">
+        {/* Right Column (Details) */}
+        <div className="md:col-span-2 w-full space-y-6 min-w-0">
           <div className="space-y-2">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50 break-words">
               {tutor.tutorName}
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground font-medium">
-              <div className="flex items-center gap-1.5">
-                <GraduationCap className="h-4 w-4 text-slate-400" />
-                <span>{tutor.institution}</span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <GraduationCap className="h-4 w-4 shrink-0 text-slate-400" />
+                <span className="truncate">{tutor.institution}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-slate-400" />
-                <span>{tutor.location}</span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                <span className="truncate">{tutor.location}</span>
               </div>
             </div>
           </div>
 
-          <Card className="shadow-sm border-slate-200/80 dark:border-zinc-800/80">
+          <Card className="shadow-sm border-slate-200/80 dark:border-zinc-800/80 w-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">
                 Professional Profile
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm leading-relaxed text-slate-600 dark:text-zinc-300">
+            <CardContent className="text-sm leading-relaxed text-slate-600 dark:text-zinc-300 break-words">
               {tutor.experience
                 ? `${tutor.experience} years of experience`
                 : "No bio configured for this profile yet."}
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
             {[
               {
-                icon: <Calendar className="h-4 w-4 text-primary" />,
+                icon: <Calendar className="h-4 w-4 text-primary shrink-0" />,
                 label: "Available Days",
                 value: tutor.availableDays || "Flexible",
               },
               {
-                icon: <Clock className="h-4 w-4 text-primary" />,
+                icon: <Clock className="h-4 w-4 text-primary shrink-0" />,
                 label: "Timing Window",
                 value: tutor.availableTime || "Contact directly",
               },
               {
-                icon: <Users className="h-4 w-4 text-amber-600" />,
+                icon: <Users className="h-4 w-4 text-amber-600 shrink-0" />,
                 label: "Slots Left",
                 value: isFullyBooked
                   ? "Fully booked"
@@ -277,14 +270,14 @@ export default function TutorDetailsPage() {
             ].map(({ icon, label, value }) => (
               <div
                 key={label}
-                className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-zinc-900 dark:bg-zinc-900/40 text-xs"
+                className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-zinc-900 dark:bg-zinc-900/40 text-xs min-w-0 w-full"
               >
                 {icon}
-                <div>
+                <div className="min-w-0">
                   <p className="font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">
                     {label}
                   </p>
-                  <p className="font-medium text-slate-800 dark:text-zinc-200">
+                  <p className="font-medium text-slate-800 dark:text-zinc-200 truncate">
                     {value}
                   </p>
                 </div>
@@ -293,7 +286,7 @@ export default function TutorDetailsPage() {
           </div>
 
           {isFullyBooked && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
+            <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium w-full">
               <AlertTriangle className="h-5 w-5 shrink-0" />
               <span>
                 This session is fully booked. No available slots left.
@@ -302,7 +295,7 @@ export default function TutorDetailsPage() {
           )}
 
           {!isFullyBooked && isBookingClosed && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm font-medium">
+            <div className="flex items-center gap-2 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm font-medium w-full">
               <Calendar className="h-5 w-5 shrink-0" />
               <span>
                 Booking is over on{" "}
@@ -314,10 +307,10 @@ export default function TutorDetailsPage() {
             </div>
           )}
 
-          <div className="pt-2">
+          <div className="pt-2 w-full">
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
-                <span>
+                <div className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     className="w-full sm:w-auto font-semibold px-8 shadow-md"
@@ -342,11 +335,11 @@ export default function TutorDetailsPage() {
                         ? "Booking Closed"
                         : "Book Class Session"}
                   </Button>
-                </span>
+                </div>
               </DialogTrigger>
 
               {!bookingBlocked && (
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] rounded-lg">
                   <DialogHeader>
                     <DialogTitle>Confirm Booking</DialogTitle>
                     <DialogDescription>
@@ -380,7 +373,7 @@ export default function TutorDetailsPage() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label htmlFor="name" className="text-xs font-semibold">
                           Your Name <span className="text-destructive">*</span>
@@ -434,6 +427,7 @@ export default function TutorDetailsPage() {
             </Dialog>
           </div>
         </div>
+
       </div>
     </div>
   );
