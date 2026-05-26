@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ProfilePage() {
-  const { data: sessionData } = authClient.useSession();
+  const { data: sessionData, revalidate } = authClient.useSession();
   const user = sessionData?.user;
   const userId = user?.id || "";
   const email = user?.email || "";
@@ -55,6 +55,7 @@ export default function ProfilePage() {
       if (tokenError || !tokenData) {
         throw new Error(tokenError?.message || "Authentication token not found");
       }
+
       if (tokenData) {
         const jwtToken = tokenData.token;
 
@@ -70,6 +71,14 @@ export default function ProfilePage() {
         const userData = await res.json();
 
         if (!res.ok) throw new Error(userData.message || "Update failed");
+
+        // Sync the auth state: force Better Auth to pull the fresh data from MongoDB
+        if (typeof revalidate === "function") {
+          await revalidate();
+        } else {
+          // Fallback for older versions of Better Auth clients
+          await authClient.getSession();
+        }
 
         toast.success("Profile updated successfully");
         setImgError(false);

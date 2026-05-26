@@ -95,15 +95,20 @@ export default function MyTutorsPage() {
       try {
         const { data: tokenData, error: tokenError } = await authClient.token();
         if (tokenError || !tokenData) {
-          throw new Error(tokenError?.message || "Authentication token not found");
+          throw new Error(
+            tokenError?.message || "Authentication token not found",
+          );
         }
         if (tokenData) {
           const jwtToken = tokenData.token;
-          const res = await fetch(`${API_BASE}/tutors/user/${currentUser.email}`, {
-            headers: {
-              Authorization: `Bearer ${jwtToken}`,
-            }
-          });
+          const res = await fetch(
+            `${API_BASE}/tutors/user/${currentUser.email}`,
+            {
+              headers: {
+                Authorization: `Bearer ${jwtToken}`,
+              },
+            },
+          );
           if (res.ok) setTutors(await res.json());
         }
       } catch (err) {
@@ -129,22 +134,34 @@ export default function MyTutorsPage() {
     e.preventDefault();
     setEditLoading(true);
     try {
-      const { _id, ...updates } = editTutor;
-      const res = await fetch(`${API_BASE}/tutors/${_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        // Update local state immediately
-        setTutors((prev) =>
-          prev.map((t) => (t._id === _id ? { ...t, ...updates } : t)),
+      const { data: tokenData, error: tokenError } = await authClient.token();
+      if (tokenError || !tokenData) {
+        throw new Error(
+          tokenError?.message || "Authentication token not found",
         );
-        setEditOpen(false);
-        toast.success("Tutor updated successfully!");
-      } else {
-        toast.error(data.message || "Update failed.");
+      }
+      if (tokenData) {
+        const jwtToken = tokenData.token;
+        const { _id, ...updates } = editTutor;
+        const res = await fetch(`${API_BASE}/tutors/${_id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify(updates),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          // Update local state immediately
+          setTutors((prev) =>
+            prev.map((t) => (t._id === _id ? { ...t, ...updates } : t)),
+          );
+          setEditOpen(false);
+          toast.success("Tutor updated successfully!");
+        } else {
+          toast.error(data.message || "Update failed.");
+        }
       }
     } catch (err) {
       toast.error("Network error. Please try again.");
@@ -157,16 +174,28 @@ export default function MyTutorsPage() {
   const handleDelete = async () => {
     setDeleteLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/tutors/${deleteTutor._id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        setTutors((prev) => prev.filter((t) => t._id !== deleteTutor._id));
-        setDeleteOpen(false);
-        toast.success("Tutor deleted successfully.");
-      } else {
-        const data = await res.json();
-        toast.error(data.message || "Delete failed.");
+      const { data: tokenData, error: tokenError } = await authClient.token();
+      if (tokenError || !tokenData) {
+        throw new Error(
+          tokenError?.message || "Authentication token not found",
+        );
+      }
+      if (tokenData) {
+        const jwtToken = tokenData.token;
+        const res = await fetch(`${API_BASE}/tutors/${deleteTutor._id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        });
+        if (res.ok) {
+          setTutors((prev) => prev.filter((t) => t._id !== deleteTutor._id));
+          setDeleteOpen(false);
+          toast.success("Tutor deleted successfully.");
+        } else {
+          const data = await res.json();
+          toast.error(data.message || "Delete failed.");
+        }
       }
     } catch (err) {
       toast.error("Network error. Please try again.");
