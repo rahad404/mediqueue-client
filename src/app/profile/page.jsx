@@ -53,24 +53,37 @@ export default function ProfilePage() {
 
       const { data: tokenData, error: tokenError } = await authClient.token();
       if (tokenError || !tokenData) {
-        throw new Error(tokenError?.message || "Authentication token not found");
+        throw new Error(
+          tokenError?.message || "Authentication token not found",
+        );
       }
 
       if (tokenData) {
         const jwtToken = tokenData.token;
 
-        const res = await fetch(`${API_BASE}/users/${userId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`
-          },
-          body: JSON.stringify(payload),
-        });
+        //------------ previous code not updating field -----------------------
+        // const res = await fetch(`${API_BASE}/users/${userId}`, {
+        //   method: "PATCH",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     Authorization: `Bearer ${jwtToken}`
+        //   },
+        //   body: JSON.stringify(payload),
+        // });
 
-        const userData = await res.json();
+        // const userData = await res.json();
 
-        if (!res.ok) throw new Error(userData.message || "Update failed");
+        // if (!res.ok) throw new Error(userData.message || "Update failed");
+        //----------------------------------------------------------------------
+
+        // new code using Better Auth's native client method
+        const { data: updateData, error: updateError } =
+          await authClient.updateUser({
+            name: trimmedName || undefined,
+            image: trimmedImage || undefined,
+          });
+        if (updateError)
+          throw new Error(updateError.message || "Update failed");
 
         // Sync the auth state: force Better Auth to pull the fresh data from MongoDB
         if (typeof revalidate === "function") {
