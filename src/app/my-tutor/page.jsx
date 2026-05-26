@@ -130,6 +130,7 @@ export default function MyTutorsPage() {
   };
 
   // submit updates
+  // submit updates
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setEditLoading(true);
@@ -140,9 +141,11 @@ export default function MyTutorsPage() {
           tokenError?.message || "Authentication token not found",
         );
       }
+
       if (tokenData) {
         const jwtToken = tokenData.token;
         const { _id, ...updates } = editTutor;
+
         const res = await fetch(`${API_BASE}/tutors/${_id}`, {
           method: "PATCH",
           headers: {
@@ -151,11 +154,13 @@ export default function MyTutorsPage() {
           },
           body: JSON.stringify(updates),
         });
+
         const data = await res.json();
+
         if (res.ok) {
-          // Update local state immediately
+          // Use the actual backend returned document (`data.tutor`) to swap into state
           setTutors((prev) =>
-            prev.map((t) => (t._id === _id ? { ...t, ...updates } : t)),
+            prev.map((t) => (t._id === _id ? data.tutor : t)),
           );
           setEditOpen(false);
           toast.success("Tutor updated successfully!");
