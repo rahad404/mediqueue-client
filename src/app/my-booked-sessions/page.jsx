@@ -1,10 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Loader2, CalendarX, AlertTriangle, XCircle, CheckCircle2, Clock, User } from "lucide-react";
+import {
+  BookOpen,
+  Loader2,
+  CalendarX,
+  AlertTriangle,
+  XCircle,
+  CheckCircle2,
+  Clock,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -64,7 +80,9 @@ export default function MyBookedSessionsPage() {
       try {
         const { data: tokenData, error: tokenError } = await authClient.token();
         if (tokenError || !tokenData) {
-          throw new Error(tokenError?.message || "Authentication token not found",);
+          throw new Error(
+            tokenError?.message || "Authentication token not found",
+          );
         }
         if (tokenData) {
           const jwtToken = tokenData.token;
@@ -86,7 +104,9 @@ export default function MyBookedSessionsPage() {
   }, [currentUser?.email]);
 
   // Confirm cancel
-  const handleCancel = async () => {
+  const handleCancel = async (e) => {
+    if (e) e.preventDefault();
+
     setCancelLoading(true);
     try {
       const { data: tokenData, error: tokenError } = await authClient.token();
@@ -95,34 +115,33 @@ export default function MyBookedSessionsPage() {
           tokenError?.message || "Authentication token not found",
         );
       }
-      if (tokenData) {
-        const jwtToken = tokenData.token;
-        // console.log(jwtToken);
-        const res = await fetch(`${API_BASE}/bookings/${cancelBooking._id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`
-          },
-          body: JSON.stringify({ bookingStatus: "cancelled" }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          // Update local state
-          setBookings((prev) =>
-            prev.map((b) =>
-              b._id === cancelBooking._id
-                ? { ...b, bookingStatus: "cancelled" }
-                : b,
-            ),
-          );
-          setCancelOpen(false);
-          toast.success("Booking cancelled. Your slot has been released.");
-        } else {
-          toast.error(data.message || "Failed to cancel booking.");
-        }
+
+      const jwtToken = tokenData.token;
+      const res = await fetch(`${API_BASE}/bookings/${cancelBooking._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+        body: JSON.stringify({ bookingStatus: "cancelled" }),
+      });
+
+      if (res.ok) {
+        setBookings((prev) =>
+          prev.map((b) =>
+            b._id === cancelBooking._id
+              ? { ...b, bookingStatus: "cancelled" }
+              : b,
+          ),
+        );
+        toast.success("Booking cancelled. Your slot has been released.");
+        setCancelOpen(false); // Close it manually ONLY after a successful update
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.message || "Failed to cancel booking.");
       }
     } catch (err) {
+      console.error("Cancellation error details:", err);
       toast.error("Network error. Please try again.");
     } finally {
       setCancelLoading(false);
@@ -292,7 +311,7 @@ export default function MyBookedSessionsPage() {
         )}
       </div>
 
-      {/* cancle confirmation */}
+      {/* cancel confirmation */}
       <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -309,9 +328,11 @@ export default function MyBookedSessionsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+            <AlertDialogCancel disabled={cancelLoading}>
+              Keep Booking
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleCancel}
+              onClick={(e) => handleCancel(e)} // Pass the click event here
               disabled={cancelLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
