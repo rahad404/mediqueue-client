@@ -31,7 +31,7 @@ import { toast } from "sonner";
 // BetterAuth session hook
 import { authClient } from "@/lib/auth-client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function TutorDetailsPage() {
   const { id } = useParams();
@@ -266,11 +266,12 @@ export default function TutorDetailsPage() {
                 value: isFullyBooked
                   ? "Fully booked"
                   : `${totalSlotsLeft} available`,
+                highlight: true // Highlight
               },
-            ].map(({ icon, label, value }) => (
+            ].map(({ icon, label, value, highlight }) => (
               <div
                 key={label}
-                className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-zinc-900 dark:bg-zinc-900/40 text-xs min-w-0 w-full"
+                className={`flex items-center gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50/50 dark:border-zinc-900 dark:bg-zinc-900/40 text-xs min-w-0 w-full transition-all duration-300 ${highlight ? 'ring-2 ring-primary shadow-[0_0_15px_-3px_rgba(251,191,36,0.3)] bg-amber-50/50 dark:bg-amber-950/20' : ''}`}
               >
                 {icon}
                 <div className="min-w-0">

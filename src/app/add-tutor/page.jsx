@@ -72,6 +72,8 @@ export default function AddTutorPage() {
       userId: session.id,
     };
 
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
     try {
       const { data: tokenData, error: tokenError} = await authClient.token();
 
@@ -80,7 +82,7 @@ export default function AddTutorPage() {
       }
       if (tokenData) {
         const jwtToken = tokenData.token;
-        const res = await fetch("http://localhost:5000/tutors", {
+        const res = await fetch(`${API_BASE}/tutors`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

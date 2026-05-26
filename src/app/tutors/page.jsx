@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 import Image from "next/image"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 // achive delay in search field while tupe
 function useDebounce(value, delay = 500) {
