@@ -30,6 +30,9 @@ export function SignupForm({ ...props }) {
         password: userData.password,
         name: userData.name,
         image: userData.image,
+        options: {
+          disableAutoSignIn: true,
+        },
       });
 
       if (error) {
@@ -91,7 +94,7 @@ export function SignupForm({ ...props }) {
 
             <Field>
               <FieldLabel htmlFor="image">Image URL</FieldLabel>
-              <Input id="image" name="image" type="text" placeholder="Profile Image URL" disabled={loading} />
+              <Input id="image" name="image" type="text" placeholder="Profile Image URL" disabled={loading} required/>
             </Field>
 
             <Field>
